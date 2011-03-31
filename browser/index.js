@@ -24,7 +24,7 @@ dnode.prototype.connect = function () {
     var client = self.proto.create();
     
     if (!params.port) params.port = parseInt(window.location.port, 10);
-    if (isNan(params.port)) delete params.port;
+    if (isNaN(params.port)) delete params.port;
     var sock = client.socketio = new io.Socket(
         params.host || window.location.hostname,
         params
