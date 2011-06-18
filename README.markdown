@@ -145,7 +145,7 @@ More features:
 * symmetric design: both sides of the connection can host up methods for the
     other side to call
 
-* use tcp streams or websockets courtesy of socket.io!
+* use TCP streams, UNIX domain sockets, or websockets courtesy of socket.io!
     (see below, just throw a webserver at `listen()`)
 
 methods
@@ -167,9 +167,10 @@ Both client and server can call `dnode()` with a wrapper.
 .connect(...)
 -------------
 
-Connect to a remote dnode service. Pass in a port, host, block, or options
-object in any order. The block function if present will be executed with the
-remote object and the connection object once the remote object is ready.
+Connect to a remote dnode service. Pass in a port, host, UNIX domain socket
+path, block, or options object in any order. The block function if present will
+be executed with the remote object and the connection object once the remote
+object is ready.
 
 You can reconnect when the connection is refused or drops by passing in a
 `reconnect` option as the number of milliseconds to wait between reconnection
@@ -180,10 +181,10 @@ Returns `this` so you can chain multiple connections.
 .listen(...)
 ------------
 
-Listen for incoming dnode clients. Pass in a port, host, block, or options
-object in any order. The block function if present will be executed with the
-remote object and the connection object once the remote object is ready for each
-client.
+Listen for incoming dnode clients. Pass in a port, host, UNIX domain socket
+path, block, or options object in any order. The block function if present will
+be executed with the remote object and the connection object once the remote
+object is ready for each client.
 
 If you pass a webserver (http.Server, https.Server, connect, express) to
 listen(), socket.io will be bound to the webserver and the dnode browser source

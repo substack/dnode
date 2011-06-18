@@ -42,9 +42,15 @@ dnode.prototype.connect = function () {
         else {
             stream = net.createConnection(params.port, params.host);
             stream.on('connect', function() {
-                attachDnode();              
+                attachDnode();
             });
         }
+    }
+    else if (params.path) {
+        stream = net.createConnection(params.path);
+        stream.on('connect', function() {
+            attachDnode();
+        });
     }
     else {
       attachDnode();
@@ -148,6 +154,13 @@ dnode.prototype.listen = function () {
                 this.emit.bind(this, 'ready')
             );
         }
+    }
+    else if (params.path) {
+        server = net.createServer();
+        server.listen(
+            params.path,
+            this.emit.bind(this, 'ready')
+        );
     }
     else if (server && server instanceof http.Server
     || 'httpAllowHalfOpen' in server || params.webserver) {
