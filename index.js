@@ -141,6 +141,7 @@ dnode.prototype.listen = function () {
                 rejectUnauthorized: params.rejectUnauthorized
             };
             server = tls.createServer(options);
+            server.on('error', this.emit.bind(this, 'error'));
             server.listen(
                 params.port, params.host,
                 this.emit.bind(this, 'ready')
@@ -148,6 +149,7 @@ dnode.prototype.listen = function () {
         }
         else {
             server = net.createServer();
+            server.on('error', this.emit.bind(this, 'error'));
             server.listen(
                 params.port, params.host,
                 this.emit.bind(this, 'ready')
@@ -156,6 +158,7 @@ dnode.prototype.listen = function () {
     }
     else if (params.path) {
         server = net.createServer();
+        server.on('error', this.emit.bind(this, 'error'));
         server.listen(
             params.path,
             this.emit.bind(this, 'ready')
@@ -200,8 +203,6 @@ dnode.prototype.listen = function () {
         
         client.start();
     }).bind(this));
-    
-    server.on('error', this.emit.bind(this, 'error'));
     
     this.server = server;
     server.on('close', this.emit.bind(this, 'close'));
