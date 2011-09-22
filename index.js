@@ -33,7 +33,7 @@ dnode.prototype.connect = function () {
     if (params.port) {
         params.host = params.host || '127.0.0.1';
         if (params.key) {
-            var options = { key: params.key, cert: params.cert };
+            var options = { key: params.key, cert: params.cert, ca : params.ca };
             stream = tls.connect(params.port, params.host, options, function() {
                 attachDnode();
             });
