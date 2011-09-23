@@ -37,6 +37,7 @@ dnode.prototype.connect = function () {
             stream = tls.connect(params.port, params.host, options, function() {
                 attachDnode();
             });
+						stream.once('close', function() { stream.emit('end'); });
         }
         else {
             stream = net.createConnection(params.port, params.host);
