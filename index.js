@@ -227,6 +227,7 @@ function createClient (proto, stream) {
     client.end = stream.end.bind(stream);
     client.destroy = stream.destroy.bind(stream);
     
+		stream.on('close', client.emit.bind(client, 'end'));
     stream.on('end', client.emit.bind(client, 'end'));
     
     client.on('request', function (req) {
