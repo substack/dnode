@@ -209,6 +209,31 @@ wire.
 
 Returns `this` so you can chain middlewares.
 
+the options object
+==================
+
+You can pass an options object to the methods `connect()` and `listen()`. Valid
+fields for this object are:
+
+* `host` is the host to connect (client) or listen (server)
+
+* `port` is the port to connect (client) or listen (server)
+
+* `path` is the path to a Unix domain socket to connect (client) or listen (server)
+
+* `reconnect` (for clients): time to wait between reconnections
+
+* `key` private key for TLS streams (required for encrypted communication)
+
+* `cert` certificate for TLS streams (required for servers)
+
+* `ca` list of trusted certificates
+
+* `requestCert` (for servers) `true` to request client certificates
+
+* `rejectUnauthorized` (for servers) `true` to terminate connections with
+no or invalid certificates
+
 the connection object
 =====================
 
