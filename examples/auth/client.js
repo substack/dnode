@@ -16,11 +16,14 @@ DNode.connect(7007, function (remote,conn) {
     remote.authenticate(user, pass, function (session) {
         if (session) {
             sys.puts('Authentication success');
-            session.quote(function (q) {
-                sys.puts('\nAnd now for a quote by ' + q.who + ':\n\n');
-                sys.puts(q.quote + '\n\n');
-                conn.end();
-            });
+            function showNext() {
+                session.quote(function (q) {
+                    sys.puts('\nAnd now for a quote by ' + q.who + ':\n\n');
+                    sys.puts(q.quote + '\n\n');
+                });
+                setTimeout(showNext, 5000);
+            }
+            showNext();
         }
         else {
             sys.puts('Authentication failure');
