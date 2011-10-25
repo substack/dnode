@@ -167,11 +167,10 @@ dnode.prototype.listen = function () {
     else if (server && (
         server instanceof http.Server
         || server.hasOwnProperty('httpAllowHalfOpen')
-        || params.webserver
     )) {
         // a webserver, use socket.io
         server = SocketIO(
-            server || params.webserver,
+            server,
             params.mount || '/dnode.js',
             params.io || {}
         );
