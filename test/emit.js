@@ -1,61 +1,68 @@
-var dnode = require('../');
+var test = require('tap').test;
 var EventEmitter = require('events').EventEmitter;
-var assert = require('assert');
+var dnode = require('../');
 
-exports['event emitter test'] = function () {
-    var emitted = false;
-    var ev = new EventEmitter;
-    ev.emit = ev.emit.bind(ev);
+test('emit events', function (t) {
+    t.plan(2);
+    var port = Math.floor(Math.random() * ((1<<16)-1e4)) + 1e4;
     
-    ev.on('test1', function (a, b, c) {
-        assert.equal(a, 1);
-        assert.equal(b, 2);
-        assert.eql(c, [3,4]);
-        emitted = true;
-    });
-    
-    Server.prototype = new EventEmitter;
-    function Server (client, conn) {
-        assert.ok(conn.id);
-        var self = this;
-        self.on = self.on.bind(self);
-        self.removeListener = self.removeListener.bind(self);
-        self.emit = self.emit.bind(self);
-        
-        self.pass = function (name, em) {
-            self.on(name, function () {
-                var args = [].slice.apply(arguments);
-                args.unshift(name);
-                em.emit.apply(em, args);
-            });
-        };
-        
-        setTimeout(function () {
-            self.emit('test1', 1, 2, [3,4]);
-            self.emit('test2', 1337);
-        }, 250);
-        
-        setTimeout(function () {
-            assert.ok(emitted, 'test1 event not emitted');
-        }, 500);
+    var subs = [];
+    function publish (name) {
+        var args = [].slice.call(arguments, 1);
+        subs.forEach(function (sub) {
+            sub.emit(name, args);
+        });
     }
     
-    var port = Math.floor(Math.random() * 40000 + 10000);
-    
-    var server = dnode(Server).listen(port);
-    server.on('ready', function () {
-        dnode.connect(port, function (remote, conn) {
-            remote.pass('test1', ev);
-            var test2_calls = 0;
-            remote.on('test2', function f () {
-                test2_calls ++;
-                assert.ok(test2_calls == 1, 'test2 emitter not removed')
-                remote.removeListener('test2', f);
-                remote.emit('test2');
-                conn.end();
-                server.close();
+    var server = dnode(function (remote, conn) {
+        this.subscribe = function (emit) {
+            subs.push({ emit : emit, id : conn.id });
+            
+            conn.on('end', function () {
+                for (var i = 0; i < subs.length; i++) {
+                    if (subs.id === conn.id) {
+                        subs.splice(i, 1);
+                        break;
+                    }
+                }
             });
+        };
+    }).listen(port);
+    
+    server.on('ready', function () {
+        setTimeout(function () {
+            var iv = setInterval(function () {
+                publish('data', Math.floor(Math.random() * 100));
+            }, 20);
+            
+            server.on('close', function () {
+                clearInterval(iv);
+            });
+        }, 20);
+        
+        var xs = [];
+        var x = dnode.connect(port, function (remote) {
+            var em = new EventEmitter;
+            em.on('data', function (n) { xs.push(n) });
+            remote.subscribe(em.emit.bind(em));
         });
+        
+        var ys = [];
+        var y = dnode.connect(port, function (remote) {
+            var em = new EventEmitter;
+            em.on('data', function (n) { ys.push(n) });
+            remote.subscribe(em.emit.bind(em))
+        });
+        
+        setTimeout(function () {
+            t.ok(xs.length > 5);
+            t.deepEqual(xs, ys);
+            
+            x.end();
+            y.end();
+            
+            server.close();
+            t.end();
+        }, 200);
     });
-};
-
+});

@@ -1,7 +1,8 @@
 var dnode = require('../');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports['nested'] = function () {
+test('nested', function (t) {
+    t.plan(4);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var EventEmitter = require('events').EventEmitter;
@@ -23,18 +24,19 @@ exports['nested'] = function () {
                 dnode.connect(port + 1, function (remote2, conn2) {
                     moo.on('hi', function (x) {
                         remote1.timesTen(x, function (res) {
-                            assert.equal(res, 5000, 'emitted value times ten');
+                            t.equal(res, 5000, 'emitted value times ten');
                             remote2.timesTwenty(res, function (res2) {
-                                assert.equal(res2, 100000, 'result times twenty');
+                                t.equal(res2, 100000, 'result times twenty');
                                 conn1.end(); conn2.end();
                                 server1.close(); server2.close();
+                                t.end();
                             });
                         });
                     });
                     remote2.timesTwenty(5, function (n) {
-                        assert.equal(n, 100);
+                        t.equal(n, 100);
                         remote1.timesTen(0.1, function (n) {
-                            assert.equal(n, 1);
+                            t.equal(n, 1);
                         });
                     });
                 });
@@ -45,4 +47,4 @@ exports['nested'] = function () {
     setTimeout(function() {
         moo.emit('hi', 500);
     }, 200);
-};
+});

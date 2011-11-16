@@ -1,9 +1,10 @@
-var assert = require('assert');
+var test = require('tap').test;
 var dnode = require('../');
 var http = require('http');
 var express = require('express');
 
-exports.checkCookieHTTP = function () {
+test('checkCookieHTTP', function (t) {
+    t.plan(3);
     var port = Math.floor(10000 + (Math.random() * Math.pow(2,16) - 10000));
     
     var web = http.createServer(function (req, res) {
@@ -15,7 +16,7 @@ exports.checkCookieHTTP = function () {
             res.end('pow');
         }
     });
-    var server = dnode().listen(web, { io : { log : null } });
+    var server = dnode().listen(web);
     
     web.listen(port, function () {
         var req = {
@@ -24,17 +25,18 @@ exports.checkCookieHTTP = function () {
             path : '/dnode.js',
         };
         http.get(req, function (res) {
-            assert.equal(res.statusCode, 200);
-            assert.equal(res.headers['content-type'], 'text/javascript');
-            assert.deepEqual(res.headers['set-cookie'], ['foo=bar']);
+            t.equal(res.statusCode, 200);
+            t.equal(res.headers['content-type'], 'text/javascript');
+            t.deepEqual(res.headers['set-cookie'], [ 'foo=bar' ]);
             
             web.close();
             server.end();
         });
     });
-};
+});
 
-exports.checkCookieExpress = function () {
+test('checkCookieExpress', function (t) {
+    t.plan(3);
     var port = Math.floor(10000 + (Math.random() * Math.pow(2,16) - 10000));
     
     var app = express.createServer();
@@ -49,7 +51,7 @@ exports.checkCookieExpress = function () {
         res.end('pow');
     });
     
-    var server = dnode().listen(app, { io : { log : null } });
+    var server = dnode().listen(app);
     
     app.listen(port, function () {
         var req = {
@@ -58,12 +60,13 @@ exports.checkCookieExpress = function () {
             path : '/dnode.js',
         };
         http.get(req, function (res) {
-            assert.equal(res.statusCode, 200);
-            assert.equal(res.headers['set-cookie'], 'foo=bar');
-            assert.equal(res.headers['content-type'], 'text/javascript');
+            t.equal(res.statusCode, 200);
+            t.deepEqual(res.headers['set-cookie'], [ 'foo=bar' ]);
+            t.equal(res.headers['content-type'], 'text/javascript');
             
             app.close();
             server.end();
+            t.end();
         });
     });
-};
+});

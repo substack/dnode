@@ -1,17 +1,17 @@
 var dnode = require('../');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports['bidirectional'] = function () {
+test('bidirectional', function (t) {
+    t.plan(5);
     var port = Math.floor(Math.random() * 40000 + 10000);
-    
     var counts = { timesX : 0, clientX : 0, x : 0 };
     
     var server = dnode(function (client) {
         this.timesX = function (n,f) {
-            assert.equal(n, 3, "timesX's n == 3");
+            t.equal(n, 3, "timesX's n == 3");
             counts.timesX ++;
             client.x(function (x) {
-                assert.equal(x, 20, 'client.x == 20');
+                t.equal(x, 20, 'client.x == 20');
                 counts.clientX ++;
                 f(n * x);
             });
@@ -26,7 +26,7 @@ exports['bidirectional'] = function () {
             }
         }).connect(port, function (remote, conn) {
             remote.timesX(3, function (res) {
-                assert.equal(res, 60, 'result of 20 * 3 == 60');
+                t.equal(res, 60, 'result of 20 * 3 == 60');
                 conn.end();
                 server.close();
             });
@@ -34,7 +34,8 @@ exports['bidirectional'] = function () {
     });
     
     server.once('close', function () {
-        assert.equal(counts.timesX, 1, 'timesX called once');
-        assert.equal(counts.clientX, 1, 'clientX called once');
+        t.equal(counts.timesX, 1, 'timesX called once');
+        t.equal(counts.clientX, 1, 'clientX called once');
+        t.end();
     });
-};
+});

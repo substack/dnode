@@ -1,9 +1,9 @@
 var dnode = require('../');
 var EventEmitter = require('events').EventEmitter;
-var util = require('util');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.broadcast = function () {
+test('broadcast', function (t) {
+    t.plan(3);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var em = new EventEmitter;
@@ -30,7 +30,7 @@ exports.broadcast = function () {
         }).connect(port, function (remote) {
             setTimeout(function () {
                 remote.message('hello!');
-            }, 250);
+            }, 25);
         });
         
         dnode({
@@ -39,7 +39,7 @@ exports.broadcast = function () {
         }).connect(port, function (remote) {
             setTimeout(function () {
                 remote.message('hey');
-            }, 500);
+            }, 50);
         });
         
         dnode({
@@ -48,27 +48,20 @@ exports.broadcast = function () {
         }).connect(port, function (remote) {
             setTimeout(function () {
                 remote.message('wowsy');
-            }, 750);
+            }, 75);
         });
     });
     
     setTimeout(function () {
         server.end();
         server.close();
-        assert.equal(
-            util.inspect(recv[0]),
-            "[ '#0 says: hello!', '#1 says: hey', '#2 says: wowsy' ]",
+        t.deepEqual(
+            recv[0],
+            [ '#0 says: hello!', '#1 says: hey', '#2 says: wowsy' ],
             "#0 didn't get the right messages"
         );
-        assert.equal(
-            util.inspect(recv[0]),
-            util.inspect(recv[1]),
-            "#1 didn't get the messages"
-        );
-        assert.equal(
-            util.inspect(recv[0]),
-            util.inspect(recv[2]),
-            "#2 didn't get the messages"
-        );
-    }, 1500);
-};
+        t.deepEqual(recv[0], recv[1], "#1 didn't get the messages");
+        t.deepEqual(recv[0], recv[2], "#2 didn't get the messages");
+        t.end();
+    }, 150);
+});

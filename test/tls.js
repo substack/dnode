@@ -6,7 +6,7 @@
 // (A) and (C) are examples for using servers/streams
 // (B) and (D) are examples for using dnode to create server and client
 
-var assert = require('assert');
+var test = require('tap').test;
 var dnode = require('../');
 var tls = require('tls');
 var fs = require('fs');
@@ -30,15 +30,17 @@ var B = dnode({name:function(cb){cb('B')}});
 var C = dnode({name:function(cb){cb('C')}});
 var D = dnode({name:function(cb){cb('D')}});
 
-exports.tls = function () {
-    var AC = setTimeout(function () { assert.fail(); }, 500);
-    var AD = setTimeout(function () { assert.fail(); }, 500);
-    var BC = setTimeout(function () { assert.fail(); }, 500);
-    var BD = setTimeout(function () { assert.fail(); }, 500);
-    var CA = setTimeout(function () { assert.fail(); }, 500);
-    var CB = setTimeout(function () { assert.fail(); }, 500);
-    var DA = setTimeout(function () { assert.fail(); }, 500);
-    var DB = setTimeout(function () { assert.fail(); }, 500);
+test('tls', function (t) {
+    t.plan(4);
+    
+    var AC = setTimeout(function () { t.fail(); }, 500);
+    var AD = setTimeout(function () { t.fail(); }, 500);
+    var BC = setTimeout(function () { t.fail(); }, 500);
+    var BD = setTimeout(function () { t.fail(); }, 500);
+    var CA = setTimeout(function () { t.fail(); }, 500);
+    var CB = setTimeout(function () { t.fail(); }, 500);
+    var DA = setTimeout(function () { t.fail(); }, 500);
+    var DB = setTimeout(function () { t.fail(); }, 500);
 
     var tlsServer = tls.createServer(optionsA);
 
@@ -52,16 +54,14 @@ exports.tls = function () {
         var tlsStream = tls.connect(ports[0], optionsC, function () {
             C.connect(tlsStream, function(remote, con){
                 remote.name(function (data) {
-                  assert.equal(data,'A');
-                  clearTimeout(AC);
+                  t.equal(data,'A');
                   con.end();
                 });
             });
         });
         D.connect(ports[0], optionsD, function (remote, con) {
             remote.name(function (data) {
-              assert.equal(data,'A');
-              clearTimeout(AD);
+              t.equal(data,'A');
               con.end();
             });
         });
@@ -76,25 +76,22 @@ exports.tls = function () {
         var tlsStream = tls.connect(ports[1], optionsC, function () {
             C.connect(tlsStream, function(remote, con){
                 remote.name(function (data) {
-                  clearTimeout(BC);
-                  assert.equal(data,'B');
+                  t.equal(data,'B');
                   con.end();
                 });
             });
         });
         D.connect(ports[1], optionsD, function (remote, con) {
             remote.name(function (data) {
-              assert.equal(data,'B');
-              clearTimeout(BD);
+              t.equal(data,'B');
               con.end();
             });
         });
     });
 
     setTimeout(function () {
-      tlsServer.close();
-      B.close();
+        tlsServer.close();
+        B.close();
+        t.end();
     }, 500);
-}
-
-
+});

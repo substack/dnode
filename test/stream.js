@@ -1,8 +1,9 @@
-var assert = require('assert');
 var dnode = require('../');
 var net = require('net');
+var test = require('tap').test;
 
-exports.stream = function () {
+test('stream', function (t) {
+    t.plan(1);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var server = dnode({
@@ -12,21 +13,17 @@ exports.stream = function () {
     var netServer = net.createServer();
     server.listen(netServer);
     
-    var to = setTimeout(function () {
-        assert.fail();
-    }, 5000);
-    
     var times = 0;
     netServer.listen(port, function () {
         var netClient = net.createConnection(port);
         dnode.connect(netClient, function (remote) {
             remote.meow(function (cats) {
-                clearTimeout(to);
-                assert.equal(cats, 'cats');
+                t.equal(cats, 'cats');
                 
                 netClient.end();
                 netServer.close();
+                t.end();
             });
         });
     });
-};
+});

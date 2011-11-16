@@ -1,15 +1,15 @@
 var dnode = require('../');
-var util = require('util');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports['circular refs'] = function () {
+test('circular refs', function (t) {
+    t.plan(7);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var server = dnode({
         sendObj : function (ref, f) {
-            assert.equal(ref.a, 1);
-            assert.equal(ref.b, 2);
-            assert.eql(ref.c, ref);
+            t.equal(ref.a, 1);
+            t.equal(ref.b, 2);
+            t.deepEqual(ref.c, ref);
             
             ref.d = ref.c;
             
@@ -23,13 +23,14 @@ exports['circular refs'] = function () {
             obj.c = obj;
             
             remote.sendObj(obj, function (ref) {
-                assert.equal(ref.a, 1);
-                assert.equal(ref.b, 2);
-                assert.eql(ref.c, ref);
-                assert.eql(ref.d, ref);
+                t.equal(ref.a, 1);
+                t.equal(ref.b, 2);
+                t.deepEqual(ref.c, ref);
+                t.deepEqual(ref.d, ref);
                 conn.end();
                 server.close();
+                t.end();
             });
         });
     });
-};
+});

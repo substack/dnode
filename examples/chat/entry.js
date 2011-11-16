@@ -1,7 +1,7 @@
-var $ = require('jquery');
+var $ = require('jquery-browserify');
 var dnode = require('dnode');
 
-$(window).ready(function () {
+$(document).ready(function () {
     // Fetch the user's name before the main chat code fires
     $('form#name').submit(function (ev) {
         ev.preventDefault();

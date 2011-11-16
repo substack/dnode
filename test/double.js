@@ -1,7 +1,8 @@
 var dnode = require('../');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.double = function () {
+test('double', function (t) {
+    t.plan(4);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var server = dnode({
@@ -20,19 +21,20 @@ exports.double = function () {
                 function (x,f) { f(x * 2) },
                 function (x,f) { f(x / 2) },
                 function (x,y) {
-                    assert.equal(x, 20, 'double, not equal');
-                    assert.equal(y, 5, 'double, not equal');
+                    t.equal(x, 20, 'double, not equal');
+                    t.equal(y, 5, 'double, not equal');
                 }
             );
             
             function plusTen(n,f) { f(n + 10) }
             
             remote.z(plusTen, plusTen, function (x,y) {
-                assert.equal(x, 20, 'double, equal');
-                assert.equal(y, 20, 'double, equal');
+                t.equal(x, 20, 'double, equal');
+                t.equal(y, 20, 'double, equal');
                 conn.end();
                 server.close();
+                t.end();
             });
         });
     });
-};
+});

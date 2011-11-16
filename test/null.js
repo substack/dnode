@@ -1,19 +1,20 @@
 var dnode = require('../');
 var test = require('tap').test;
 
-test('simple', function (t) {
+test('null', function (t) {
     t.plan(7);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var server = dnode({
-        timesTen : function (n,reply) {
+        empty : null,
+        timesTen : function (n, reply) {
             t.equal(n, 50);
             reply(n * 10);
         },
         moo : function (reply) { reply(100) },
         sTimesTen : function (n, cb) {
             t.equal(n, 5);
-            cb(n * 10);
+            cb(n * 10, null);
         },
     }).listen(port.toString()); // test for stringified ports too why not
     

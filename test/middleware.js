@@ -1,28 +1,30 @@
 var dnode = require('../');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.middleware = function () {
+test('middleware', function (t) {
+    t.plan(5);
+    
     var port = Math.floor(Math.random() * 40000 + 10000);
     var tf = setTimeout(function () {
-        assert.fail('never finished');
+        t.fail('never finished');
     }, 1000);
     
     var tr = setTimeout(function () {
-        assert.fail('never ready');
+        t.fail('never ready');
     }, 1000);
     
     var tc = setTimeout(function () {
-        assert.fail('connection not ready');
+        t.fail('connection not ready');
     }, 1000);
     
     var server = dnode(function (client, conn) {
-        assert.ok(!conn.zing);
-        assert.ok(!client.moo);
+        t.ok(!conn.zing);
+        t.ok(!client.moo);
         
         conn.on('ready', (function () {
             clearTimeout(tr);
-            assert.ok(conn.zing);
-            assert.ok(this.moo);
+            t.ok(conn.zing);
+            t.ok(this.moo);
         }).bind(this));
         
         this.baz = 42;
@@ -42,9 +44,10 @@ exports.middleware = function () {
     server.on('ready', function () {
         dnode.connect(port, function (remote, conn) {
             clearTimeout(tf);
-            assert.ok(remote.baz);
+            t.ok(remote.baz);
             conn.end();
             server.close();
+            t.end();
         });
     });
-};
+});

@@ -1,8 +1,9 @@
 var dnode = require('../');
 var sys = require('sys');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.errors = function () {
+test('errors', function (t) {
+    t.plan(4);
     var port = Math.floor(Math.random() * 40000 + 10000);
     var errors = { server : [], client : [] };
     
@@ -25,19 +26,20 @@ exports.errors = function () {
     }).listen(port);
     
     var ts = setTimeout(function () {
-        assert.fail('server never ended');
+        t.fail('server never ended');
     }, 5000);
     
     server.on('end', function () {
         clearTimeout(ts);
-        assert.eql(errors.server[0], 'string throw');
+        t.deepEqual(errors.server[0], 'string throw');
         
         try { undefined.name }
         catch (refErr) {
             process.nextTick(function () {
-                assert.eql(refErr.message, errors.server[1].message);
-                assert.eql(refErr.type, errors.server[1].type);
-                assert.equal(errors.server.length, 2);
+                t.equal(refErr.message, errors.server[1].message);
+                t.equal(refErr.type, errors.server[1].type);
+                t.equal(errors.server.length, 2);
+                t.end();
             });
         }
     });
@@ -49,7 +51,7 @@ exports.errors = function () {
             });
             
             conn.on('end', function () {
-                assert.eql(errors.client, [ 'Local error' ]);
+                t.deepEqual(errors.client, [ 'Local error' ]);
             });
             
             this.pow = function () {
@@ -67,21 +69,19 @@ exports.errors = function () {
             }, 500);
         });
     });
-};
+});
 
-exports.refused = function () {
+test('refused', function (t) {
+    t.plan(2);
+    
     var port = Math.floor(Math.random() * 40000 + 10000);
     var client = dnode.connect(port, function (remote, conn) {
         assert.fail('should have been refused, very unlikely');
     });
     
-    var to = setTimeout(function () {
-        assert.fail('never caught error');
-    }, 5000);
-    
     client.on('error', function (err) {
-        clearTimeout(to);
-        assert.equal(err.code, 'ECONNREFUSED');
-        assert.equal(err.syscall, 'connect');
+        t.equal(err.code, 'ECONNREFUSED');
+        t.equal(err.syscall, 'connect');
+        t.end();
     });
-}
+});

@@ -12,6 +12,7 @@ It works over network sockets and even in the browser with
 Plus, there are dnode implementations for
 [perl](http://github.com/substack/dnode-perl),
 [ruby](http://github.com/substack/dnode-ruby),
+[php](https://github.com/bergie/dnode-php),
 and
 [java](https://github.com/aslakhellesoy/dnode-java),
 so you can glue
@@ -257,10 +258,12 @@ Using [npm](http://npmjs.org):
 
     npm install dnode
 
-Or check out the repository and link your development copy:
+Or check out the repository and fetch the deps with npm, then build the bundle:
 
     git clone https://github.com/substack/dnode.git
-    cd dnode && npm link
+    cd dnode
+    npm install --dev
+    node bin/bundle.js
 
 The dnode dependencies are listed in the
 [package.json](https://github.com/substack/dnode/tree/master/package.json).
@@ -294,6 +297,7 @@ between scripts written in different languages.
 
 * [dnode-perl](http://github.com/substack/dnode-perl)
 * [dnode-ruby](http://github.com/substack/dnode-ruby)
+* [dnode-php](https://github.com/bergie/dnode-php)
 * [dnode-java](https://github.com/aslakhellesoy/dnode-java)
 
 There's a 

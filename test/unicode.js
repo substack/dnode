@@ -1,7 +1,8 @@
 var dnode = require('../');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.simple = function () {
+test('unicode', function (t) {
+    t.plan(2);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var server = dnode({
@@ -12,15 +13,14 @@ exports.simple = function () {
     
     server.on('ready', function () {
         dnode.connect(port, function (remote, conn) {
-            assert.equal(conn.stream.remoteAddress, '127.0.0.1');
+            t.equal(conn.stream.remoteAddress, '127.0.0.1');
             remote.unicodes(function (str) {
-                assert.equal(str, '☔☔☔☁☼☁❄', 'remote unicodes == ☔☔☔☁☼☁❄');
-            });
-            
-            setTimeout(function () {
+                t.equal(str, '☔☔☔☁☼☁❄', 'remote unicodes == ☔☔☔☁☼☁❄');
+                
                 conn.end();
                 server.close();
-            }, 50);
+                t.end();
+            });
         });
     });
-};
+});

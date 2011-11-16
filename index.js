@@ -6,8 +6,7 @@ var EventEmitter = require('events').EventEmitter;
 var protocol = require('dnode-protocol');
 var Lazy = require('lazy');
 var weak = require('weak');
-
-var SocketIO = null;
+var SocketIO = require('./lib/stream_socketio');
 
 exports = module.exports = dnode;
 
@@ -129,11 +128,11 @@ dnode.prototype.connect = function () {
 };
 
 dnode.prototype.listen = function () {
+    var self = this;
     var params = protocol.parseArgs(arguments);
     var server = params.server;
     
     if (params.port) {
-        params.host = params.host || '127.0.0.1';
         if (params.key) {
             var options = {
                 key: params.key,
@@ -143,13 +142,23 @@ dnode.prototype.listen = function () {
                 rejectUnauthorized: params.rejectUnauthorized
             };
             server = tls.createServer(options);
-            server.listen(
-                params.port, params.host,
-                this.emit.bind(this, 'ready')
-            );
+            server.on('error', this.emit.bind(this, 'error'));
+            if (params.host) {
+                server.listen(
+                    params.port, params.host,
+                    this.emit.bind(this, 'ready')
+                );
+            }
+            else {
+                server.listen(
+                    params.port,
+                    this.emit.bind(this, 'ready')
+                );
+            }
         }
         else {
             server = net.createServer();
+            server.on('error', this.emit.bind(this, 'error'));
             server.listen(
                 params.port, params.host,
                 this.emit.bind(this, 'ready')
@@ -158,6 +167,7 @@ dnode.prototype.listen = function () {
     }
     else if (params.path) {
         server = net.createServer();
+        server.on('error', this.emit.bind(this, 'error'));
         server.listen(
             params.path,
             this.emit.bind(this, 'ready')
@@ -169,7 +179,6 @@ dnode.prototype.listen = function () {
         || params.webserver
     )) {
         // a webserver, use socket.io
-        if (!SocketIO) SocketIO = require('./lib/stream_socketio');
         server = SocketIO(
             server || params.webserver,
             params.mount || '/dnode.js',
@@ -187,11 +196,11 @@ dnode.prototype.listen = function () {
         : 'connection'
     ;
     
-    server.on(listenFor, (function (stream) {
-        var client = createClient(this.proto, stream);
+    server.on(listenFor, function (stream) {
+        var client = createClient(self.proto, stream);
         clients[client.id] = client;
         
-        this.stack.forEach(function (middleware) {
+        self.stack.forEach(function (middleware) {
             middleware.call(client.instance, client.remote, client);
         });
         
@@ -202,9 +211,7 @@ dnode.prototype.listen = function () {
         }
         
         client.start();
-    }).bind(this));
-    
-    server.on('error', this.emit.bind(this, 'error'));
+    });
     
     this.server = server;
     server.on('close', this.emit.bind(this, 'close'));

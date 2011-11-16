@@ -1,7 +1,8 @@
 var dnode = require('../');
-var assert = require('assert');
+var test = require('tap').test;
 
-exports.recon = function () {
+test('recon', function (t) {
+    t.plan(4);
     var port = Math.floor(Math.random() * 40000 + 10000);
     
     var scounts = { connect : 0, ready : 0 };
@@ -13,8 +14,6 @@ exports.recon = function () {
             scounts.ready ++;
         });
     }).listen(port);
-    
-    var alive = true;
     
     dnode(function (remote, conn) {
         ccounts.connect ++;
@@ -33,13 +32,13 @@ exports.recon = function () {
     }).connect(port, { reconnect : 100 });
     
     setTimeout(function () {
-        assert.ok(scounts.connect >= 2);
-        assert.ok(scounts.ready >= 2);
+        t.ok(scounts.connect >= 2);
+        t.ok(scounts.ready >= 2);
         
-        assert.eql(ccounts.connect, scounts.connect);
-        assert.eql(ccounts.ready, scounts.ready);
+        t.equal(ccounts.connect, scounts.connect);
+        t.equal(ccounts.ready, scounts.ready);
         
         server.close();
-        alive = false;
+        t.end();
     }, 1000);
-};
+});
