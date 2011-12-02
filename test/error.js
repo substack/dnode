@@ -85,3 +85,20 @@ test('refused', function (t) {
         t.end();
     });
 });
+
+test('refused with reconnect-option', function (t) {
+    t.plan(2);
+    
+    var port = Math.floor(Math.random() * 40000 + 10000);
+    var client = dnode.connect(port, {reconnect:100}, function (remote, conn) {
+        assert.fail('should have been refused, very unlikely');
+    });
+    
+    client.on('error', function (err) {
+        t.equal(err.code, 'ECONNREFUSED');
+        t.equal(err.syscall, 'connect');
+        client.destroy();
+        t.end();
+    }); 
+});
+
