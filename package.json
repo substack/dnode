@@ -25,6 +25,7 @@
         "socket.io" : "0.8.6",
         "socket.io-client" : "https://github.com/substack/socket.io-client/tarball/master",
         "lazy" : ">=1.0.5 <1.1",
+        "weak": "*",
         "traverse" : "0.4.x",
         "dnode-protocol" : "0.1.x",
         "jsonify" : "0.0.x"

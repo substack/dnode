@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var protocol = require('dnode-protocol');
 var Lazy = require('lazy');
+var weak = require('weak');
 var SocketIO = require('./lib/stream_socketio');
 
 exports = module.exports = dnode;
@@ -227,6 +228,21 @@ dnode.prototype.listen = function () {
 
 function createClient (proto, stream) {
     var client = proto.create();
+    client.remoteStore.on('wrapped', function(id, wrappedObject) {
+      var f = wrappedObject[id].f
+      wrappedObject[id] = {}
+      f = weak(f, function() {
+        var cullNotify = typeof wrappedObject[id] === 'object';
+        delete wrappedObject[id];
+        if (cullNotify) {
+          delete client.remoteStore.items[id];
+          client.remoteStore.emit('cull', id);
+        }
+      })
+      wrappedObject[id].__defineGetter__('f', function() {
+        return weak.get(f);
+      })
+    })
     
     process.nextTick(function () {
         if (client.listeners('error').length === 0) {
