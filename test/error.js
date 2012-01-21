@@ -85,3 +85,18 @@ test('refused', function (t) {
         t.end();
     });
 });
+
+test('close same server twice shouldn\'t throw errors', function(t) {
+    var port = Math.floor(Math.random() * 40000 + 10000);
+    var server = dnode();
+    server.on('ready', function() {
+        server.once('close', function() {
+            server.once('close', function() {
+                t.end();
+            })
+            server.close();
+        })
+        server.close();
+    });
+    server.listen(port);
+})

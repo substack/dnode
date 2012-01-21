@@ -270,9 +270,19 @@ dnode.prototype.end = function () {
 };
 
 dnode.prototype.close = function () {
-    this.server.close();
+    var self = this
+    try {
+        self.server.close();
+    } catch (e) {
+        if (e.message === 'Not running') {
+            self.server.emit('close');
+        } else {
+          // forward as error event
+          self.server.emit('error', e);
+        }
+    }
 };
- 
+
 dnode.connect = function () {
     var d = dnode();
     return d.connect.apply(d, arguments);
