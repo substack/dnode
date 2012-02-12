@@ -85,3 +85,15 @@ test('refused', function (t) {
         t.end();
     });
 });
+
+
+test('bad connection string', function(t) {
+    try {
+        var client = dnode.connect('garbage', function (remote, conn) {
+            assert.fail('should have been refused, very unlikely');
+        });
+    } catch (err) {
+        t.ok(/Could not create a stream/.test(err.message));
+        t.end();
+    }
+});

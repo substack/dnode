@@ -100,6 +100,10 @@ dnode.prototype.connect = function () {
     }
     
     function attachDnode() {
+        if (!stream) {
+            self.emit('error', new Error('Could not create a stream with this information ' + JSON.stringify(params)))
+            return null
+        }
         client = createClient(self.proto, stream);
         
         client.end = function () {
