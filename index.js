@@ -69,7 +69,7 @@ dnode.prototype.connect = function () {
     
     if (params.reconnect) {
         stream.on('error', (function (err) {
-            if (err.code === 'ECONNREFUSED') {
+            if (err.code === 'ECONNREFUSED' || err.code === 'ENOENT') {
                 if (client) client.emit('refused');
                 
                 setTimeout((function () {
