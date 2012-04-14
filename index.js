@@ -242,6 +242,8 @@ function createClient (proto, stream) {
     client.destroy = stream.destroy.bind(stream);
     
     stream.on('end', client.emit.bind(client, 'end'));
+    stream.on('disconnect', client.emit.bind(client, 'disconnect'));
+    stream.on('close', client.emit.bind(client, 'close'));
     
     client.on('request', function (req) {
         if (stream.writable) {
