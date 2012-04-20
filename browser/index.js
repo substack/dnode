@@ -2,6 +2,8 @@ var protocol = require('dnode-protocol');
 var EventEmitter = require('events').EventEmitter;
 var io = require('socket.io-client');
 var json = typeof JSON === 'object' ? JSON : require('jsonify');
+var cached;
+var callbackList;
 
 var exports = module.exports = dnode;
 
@@ -22,8 +24,18 @@ dnode.prototype.use = function (middleware) {
 dnode.prototype.connect = function () {
     var self = this;
     var params = protocol.parseArgs(arguments);
-    var client = self.proto.create();
     
+    if (cached) {
+        return params.block && 
+            params.block.call(cached.instance, cached.client, cached);
+    } else if (callbackList) {
+        return callbackList.push(params.block)
+    }
+
+    callbackList = [params.block];
+    
+    var client = self.proto.create();
+
     var proto = (params.proto || window.location.protocol)
         .replace(/:.*/, '') + '://';
     
@@ -52,11 +64,15 @@ dnode.prototype.connect = function () {
         sock.send(json.stringify(req) + '\n');
     });
     
-    if (params.block) {
-        client.on('remote', function () {
-            params.block.call(client.instance, client.remote, client);
-        });
-    }
+    client.on('remote', function () {
+        cached = client;
+        var queue = callbackList;
+        callbackList = null;
+        for (var key in queue) {
+            var block = queue[key];
+            block.call(client.instance, client.remote, client);
+        }
+    });
     
     this.stack.forEach(function (middleware) {
         middleware.call(client.instance, client.remote, client);
