@@ -10,7 +10,7 @@ if (!path.existsSync(__dirname + '/../browser/bundle.js')) {
 
 test('checkCookieHTTP', function (t) {
     t.plan(3);
-    var port = Math.floor(1e4 + (Math.random() * 5e4 - 1e4));
+    var port = Math.floor(Math.random() * 40000 + 10000);
     
     var web = http.createServer(function (req, res) {
         res.setHeader('set-cookie', [ 'foo=bar' ]);
