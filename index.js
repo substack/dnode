@@ -142,7 +142,7 @@ dnode.prototype.listen = function () {
     var params = protocol.parseArgs(arguments);
     var server = params.server;
     
-    if (params.port) {
+    if (params.port != null) {
         if (params.key) {
             var options = {
                 key: params.key,
