@@ -108,7 +108,7 @@ dnode.prototype.listen = function () {
     
     server.sessions = {};
     
-    if (params.port) {
+    if (params.port !== undefined) {
         server.listen(params.port, params.host);
     }
     else if (params.path) {
