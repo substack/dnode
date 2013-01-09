@@ -49,6 +49,9 @@ D.prototype.connect = function () {
     else if (params.port) {
         stream = net.connect(params.port, params.host);
     }
+    else if (params.stream) {
+        stream = params.stream
+    }
     else {
         throw new Error('no port or unix path given');
     }
