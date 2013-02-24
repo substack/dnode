@@ -26,8 +26,9 @@ function D (cons, opts) {
     if (opts.weak !== false && !opts.proto) {
         opts.proto = {};
         opts.proto.wrap = function (cb, id) {
+            var proto = this;
             return weak(cb, function () {
-                if (self.proto) self.proto.cull(id);
+                proto.cull(id);
             });
         };
         opts.proto.unwrap = function (ref, id) {
