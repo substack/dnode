@@ -2,7 +2,6 @@ var dnode = require('./lib/dnode');
 var parseArgs = require('./lib/parse_args');
 var net = require('net');
 var util = require('util');
-var weak = require('weak');
 
 exports = module.exports = function (cons, opts) {
     return new D(cons, opts);
@@ -24,16 +23,25 @@ function D (cons, opts) {
     if (!opts) opts = {};
     
     if (opts.weak !== false && !opts.proto) {
-        opts.proto = {};
-        opts.proto.wrap = function (cb, id) {
-            return weak(cb, function () {
-                if (self.proto) self.proto.cull(id);
-            });
-        };
-        opts.proto.unwrap = function (ref, id) {
-            var cb = weak.get(ref);
-            return cb || function () {};
-        };
+        try {
+            var weak = require('weak');
+        } catch(e) {
+            console.log('Skipping weak: native binding not available: ' + e.stack);
+            opts.weak = false;
+        }
+        if(opts.weak) {
+            opts.proto = {};
+            opts.proto.wrap = function (cb, id) {
+                return weak(cb, function () {
+                    if (self.proto) self.proto.cull(id);
+                });
+            };
+            opts.proto.unwrap = function (ref, id) {
+                var cb = weak.get(ref);
+                return cb || function () {};
+            };
+        }
+
     }
     return dnode.call(self, cons, opts);
 }
