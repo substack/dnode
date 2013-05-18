@@ -86,6 +86,7 @@ dnode.prototype.listen = function () {
         
         //Set client's Address
         d.remoteAddress=stream.remoteAddress;
+        d.remotePort=stream.remotePort;
         
         server.sessions[d.id] = d;
         d.on('end', function () {
