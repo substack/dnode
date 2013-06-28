@@ -1,0 +1,4 @@
+example/
+perf/
+test/
+.travis.yml
