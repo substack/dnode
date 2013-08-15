@@ -2,7 +2,7 @@ var dnode = require('./lib/dnode');
 var parseArgs = require('./lib/parse_args');
 var net = require('net');
 var util = require('util');
-var weak = require('weak');
+var weak
 
 exports = module.exports = function (cons, opts) {
     return new D(cons, opts);
@@ -24,6 +24,10 @@ function D (cons, opts) {
     if (!opts) opts = {};
     
     if (opts.weak !== false && !opts.proto) {
+        if (!weak) {
+            weak = require("weak")
+        }
+        
         opts.proto = {};
         opts.proto.wrap = function (cb, id) {
             var proto = this;
