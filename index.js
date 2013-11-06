@@ -4,6 +4,12 @@ var net = require('net');
 var util = require('util');
 var weak
 
+try {
+    weak = require("weak");
+} catch(e) {
+    weak = null;
+}
+
 exports = module.exports = function (cons, opts) {
     return new D(cons, opts);
 };
@@ -23,11 +29,7 @@ function D (cons, opts) {
     var self = this;
     if (!opts) opts = {};
     
-    if (opts.weak !== false && !opts.proto) {
-        if (!weak) {
-            weak = require("weak")
-        }
-        
+    if (opts.weak !== false && !opts.proto && weak) {
         opts.proto = {};
         opts.proto.wrap = function (cb, id) {
             var proto = this;
