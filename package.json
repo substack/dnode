@@ -13,7 +13,7 @@
   },
   "dependencies" : {
     "dnode-protocol" : "~0.2.2",
-    "jsonify" : "~0.0.0"
+    "super-json" : "0.0.2"
   },
   "optionalDependencies": {
     "weak": "~0.3.0"
