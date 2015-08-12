@@ -26,4 +26,5 @@ reconnect({}, function(net) {
     setTimeout(function(){console.log('closing dnode'); d.end();}, 2000);
 })
 .on('reconnect', function(n) { console.log("\n\nreconnecting...\n"); })
+.on('error', function(err) { console.log("reconnect error", err); })
 .connect(5004);
