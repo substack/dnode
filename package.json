@@ -16,7 +16,7 @@
     "jsonify" : "~0.0.0"
   },
   "optionalDependencies": {
-    "weak": "~0.4.1"
+    "weak": "^1.0.0"
   },
   "devDependencies" : {
     "tape" : "~2.3.2"
