@@ -88,6 +88,10 @@ dnode.prototype.listen = function () {
         do { d.id = randomId() }
         while (server.sessions[d.id]);
         
+        //Set client's Address
+        d.remoteAddress=stream.remoteAddress;
+        d.remotePort=stream.remotePort;
+        
         server.sessions[d.id] = d;
         d.on('end', function () {
             delete server.sessions[d.id];
