@@ -1,0 +1,11 @@
+{
+  "name": "dnode-engine.io-example",
+  "version": "0.0.0",
+  "dependencies": {
+    "ecstatic": "~0.1.6",
+    "domready": "~0.2.11",
+    "browserify": "~1.12.3",
+    "engine.io-stream": "~0.4.3"
+  },
+  "private": true
+}
