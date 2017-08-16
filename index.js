@@ -103,7 +103,7 @@ dnode.prototype.listen = function () {
         
         stream.on('error', function (err) {
             if (err && err.code === 'EPIPE') return; // eat EPIPEs
-            d.emit('error', err);
+            server.emit('error', err);
         });
         
         d.stream = stream;
