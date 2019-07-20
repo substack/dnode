@@ -25,7 +25,7 @@ function D (cons, opts) {
     
     if (opts.weak !== false && !opts.proto) {
         if (!weak) {
-            weak = require("weak")
+            weak = require("weak-napi")
         }
         
         opts.proto = {};
