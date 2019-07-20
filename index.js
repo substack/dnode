@@ -25,7 +25,12 @@ function D (cons, opts) {
     
     if (opts.weak !== false && !opts.proto) {
         if (!weak) {
-            weak = require("weak-napi")
+            if (parseInt(process.version.substr(1)) < 6) {
+                weak = require("weak")
+            }
+            else {
+                weak = require("weak-napi")
+            }
         }
         
         opts.proto = {};
